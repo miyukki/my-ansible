@@ -1,0 +1,25 @@
+- hosts: web
+  remote_user: admin
+  sudo: no
+  roles:
+    - role: rvm_io.rvm1-ruby
+      rvm1_rubies:
+        - 2.2.1
+      rvm1_rvm_version: 'stable'
+      sudo: yes
+    - role: nginx
+      app_host: localhost
+      app_name: application
+    - role: mysql
+      mysql_username: user
+      mysql_password: password
+      mysql_database: database
+  tasks:
+    - name: install ImageMagick-devel and mysql-devel
+      sudo: yes
+      yum: name={{item}} state=latest
+      with_items:
+        - ImageMagick
+        - ImageMagick-devel
+        - mysql-devel
+        - MySQL-python

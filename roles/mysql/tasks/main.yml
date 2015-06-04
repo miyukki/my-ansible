@@ -1,0 +1,26 @@
+- name: install mysql community repo
+  yum: name=http://dev.mysql.com/get/mysql-community-release-el6-5.noarch.rpm state=present
+  sudo: yes
+
+- name: install mysql tools and MySQL-python
+  yum: name={{item}} state=latest
+  sudo: yes
+  with_items:
+    - mysql
+    - mysql-devel
+    - mysql-server
+    - MySQL-python
+
+- name: copy mysql confing
+  template: src=my.cnf dest=/etc/my.cnf mode=0644
+  notify: restart mysqld
+
+- name: start and enable mysqld
+  service: name=mysqld state=started enabled=yes
+  sudo: yes
+
+- name: create application database
+  mysql_db: name={{mysql_database}} encoding=utf8 state=present
+
+- name: create application database user
+  mysql_user: name={{mysql_username}} password={{mysql_password}} host=% priv={{mysql_database}}.*:ALL state=present
